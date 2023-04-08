@@ -59,6 +59,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /fs/create:
+    post:
+      operationId: create
+      summary: Create a file or directory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequest"
+      responses:
+        "201":
+          description: File or directory created
+        "400":
+          description: Path already exists or invalid type
+        "500":
+          description: Error creating file or directory
   /fs/append:
     post:
       operationId: appendToFile
@@ -142,3 +159,22 @@ components:
         error:
           type: string
           description: A description of the error that occurred
+
+    CreateRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path to the directory where the file or directory will be created
+        filename:
+          type: string
+          description: The name of the file or directory to be created (optional)
+        type:
+          type: string
+          description: The type of the item to create, either "file" or "directory"
+        content:
+          type: string
+          description: The initial content of the file, if creating a file (optional)
+      required:
+        - path
+        - type

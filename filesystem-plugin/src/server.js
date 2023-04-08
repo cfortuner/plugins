@@ -91,6 +91,40 @@ app.post("/fs/append", (req, res) => {
   });
 });
 
+// Create a file or directory
+app.post("/fs/create", (req, res) => {
+  const { path: reqPath, filename = "", type, content } = req.body;
+  const requestedPath = path.join(
+    root,
+    path.normalize(reqPath),
+    path.normalize(filename)
+  );
+
+  fs.exists(requestedPath, (exists) => {
+    if (exists) {
+      return res.status(400).send("Path already exists");
+    }
+
+    if (type === "file") {
+      fs.writeFile(requestedPath, content || "", (err) => {
+        if (err) {
+          return res.status(500).send("Error creating file");
+        }
+        res.status(201).send("File created");
+      });
+    } else if (type === "directory") {
+      fs.mkdir(requestedPath, (err) => {
+        if (err) {
+          return res.status(500).send("Error creating directory");
+        }
+        res.status(201).send("Directory created");
+      });
+    } else {
+      res.status(400).send("Invalid type");
+    }
+  });
+});
+
 // ---- unused ----
 
 // Upsert a file or directory
